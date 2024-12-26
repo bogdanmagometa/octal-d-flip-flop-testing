@@ -1,0 +1,44 @@
+dont_use_io iocell 0 6
+dont_use_io iocell 0 7
+dont_use_io iocell 6 0
+dont_use_io iocell 6 1
+set_location "cy_dffe_8" macrocell 1 0 0 1
+set_location "cy_dffe_1" macrocell 1 1 1 1
+set_location "cy_dffe_4" macrocell 1 0 1 2
+set_location "cy_dffe_6" macrocell 1 0 0 3
+set_location "Net_235_split" macrocell 1 1 0 0
+set_location "cy_dffe_2" macrocell 1 0 0 2
+set_location "cy_dffe_3" macrocell 1 0 1 1
+set_location "cy_dffe_5" macrocell 1 0 1 3
+set_location "Net_222" macrocell 1 0 0 0
+set_location "Net_235" macrocell 1 1 1 0
+set_location "Net_221" macrocell 1 0 1 0
+set_location "cy_dffe_7" macrocell 0 0 0 0
+set_location "\D_Reg:Sync:ctrl_reg\" controlcell 1 1 6 
+set_io "\UART:rx(0)\" iocell 1 4
+set_io "Port_D(0)" iocell 0 5
+set_io "Pin_C(0)" iocell 0 0
+set_io "Port_D(1)" iocell 0 2
+set_io "Port_Q(0)" iocell 0 3
+set_io "Port_Q(3)" iocell 0 4
+set_io "Port_Q(6)" iocell 1 2
+set_location "\C_Reg:Sync:ctrl_reg\" controlcell 1 0 6 
+set_location "\Eq_Reg:sts:sts_reg\" statuscell 1 1 3 
+set_location "ClockGenBlock" m0s8clockgenblockcell -1 -1 0
+set_io "\UART:tx(0)\" iocell 1 5
+set_io "Port_Q(2)" iocell 1 0
+set_io "Port_D(5)" iocell 1 1
+set_location "ClockBlock" m0s8clockblockcell -1 -1 0
+set_io "Port_Q(5)" iocell 0 1
+set_io "Port_Q(7)" iocell 1 3
+set_io "Port_D(4)" iocell 1 6
+set_io "Port_D(2)" iocell 1 7
+set_io "Port_D(7)" iocell 2 0
+set_io "Port_Q(1)" iocell 2 1
+set_io "Port_Q(4)" iocell 2 2
+set_io "Port_D(6)" iocell 2 3
+set_io "Pin_nEN(0)" iocell 2 5
+set_io "Pin_ERR(0)" iocell 2 6
+set_io "Pin_OK(0)" iocell 3 6
+set_io "Port_D(3)" iocell 2 4
+set_location "\UART:SCB\" m0s8scbcell -1 -1 0

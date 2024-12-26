@@ -1,0 +1,1856 @@
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.delay,"ax",%progbits
+  20              		.align	2
+  21              		.global	delay
+  22              		.code	16
+  23              		.thumb_func
+  24              		.type	delay, %function
+  25              	delay:
+  26              	.LFB37:
+  27              		.file 1 "main.c"
+   1:main.c        **** #include "project.h"
+   2:main.c        **** #include <stdio.h>
+   3:main.c        **** 
+   4:main.c        **** #define LOW (0)
+   5:main.c        **** #define HIGH (1)
+   6:main.c        **** #define NUM_ACTIONS_IN_SEQUENCE (6)
+   7:main.c        **** 
+   8:main.c        **** void delay();
+   9:main.c        **** void report_incorrect();
+  10:main.c        **** void report_correct();
+  11:main.c        **** int check();
+  12:main.c        **** int next_seq(int *seq, int size, int max_number);
+  13:main.c        **** 
+  14:main.c        **** int main(void)
+  15:main.c        **** {
+  16:main.c        ****     CyGlobalIntEnable;
+  17:main.c        ****     
+  18:main.c        ****     UART_Start();
+  19:main.c        ****     
+  20:main.c        ****     Pin_OK_Write(HIGH);
+  21:main.c        ****     Pin_ERR_Write(HIGH);
+  22:main.c        **** 
+  23:main.c        ****     for(;;)
+  24:main.c        ****     {
+  25:main.c        **** start_outer_loop:;
+  26:main.c        ****         uint8_t cur_d = 0;
+  27:main.c        ****         int cur_c = 1;
+  28:main.c        ****         D_Reg_Write(0b00000000);
+  29:main.c        ****         C_Reg_Write(0b0);
+  30:main.c        ****         delay();
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 2
+
+
+  31:main.c        ****         C_Reg_Write(0b1);
+  32:main.c        ****         delay();
+  33:main.c        ****         if (!check()) {
+  34:main.c        ****             report_incorrect();
+  35:main.c        ****         }
+  36:main.c        ****         int seq_of_actions[NUM_ACTIONS_IN_SEQUENCE] = {0};
+  37:main.c        ****         do {
+  38:main.c        ****             for (int num_action = 0; num_action < NUM_ACTIONS_IN_SEQUENCE; num_action++) {
+  39:main.c        ****                 int action_code = seq_of_actions[num_action];
+  40:main.c        ****                 if (action_code == 8) {
+  41:main.c        ****                     cur_c = !cur_c;
+  42:main.c        ****                 } else {
+  43:main.c        ****                     cur_d = cur_d ^ (0b1 << action_code);
+  44:main.c        ****                 }
+  45:main.c        ****                 D_Reg_Write(cur_d);
+  46:main.c        ****                 C_Reg_Write(cur_c);
+  47:main.c        ****                 delay();
+  48:main.c        ****                 
+  49:main.c        ****                 
+  50:main.c        ****                 if (!check()) {
+  51:main.c        ****                     report_incorrect();
+  52:main.c        ****                     goto start_outer_loop;
+  53:main.c        ****                 }
+  54:main.c        ****             }
+  55:main.c        ****         } while (next_seq(seq_of_actions, NUM_ACTIONS_IN_SEQUENCE, 8));
+  56:main.c        ****         report_correct();
+  57:main.c        ****     }
+  58:main.c        **** }
+  59:main.c        **** 
+  60:main.c        **** void delay() 
+  61:main.c        **** {
+  28              		.loc 1 61 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 10B5     		push	{r4, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+  35              		.cfi_offset 14, -4
+  62:main.c        ****     CyDelayCycles(1);
+  36              		.loc 1 62 0
+  37 0002 0120     		movs	r0, #1
+  38 0004 FFF7FEFF 		bl	CyDelayCycles
+  39              	.LVL0:
+  63:main.c        **** }
+  40              		.loc 1 63 0
+  41              		@ sp needed
+  42 0008 10BD     		pop	{r4, pc}
+  43              		.cfi_endproc
+  44              	.LFE37:
+  45              		.size	delay, .-delay
+  46 000a C046     		.section	.text.report_incorrect,"ax",%progbits
+  47              		.align	2
+  48              		.global	report_incorrect
+  49              		.code	16
+  50              		.thumb_func
+  51              		.type	report_incorrect, %function
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 3
+
+
+  52              	report_incorrect:
+  53              	.LFB38:
+  64:main.c        **** 
+  65:main.c        **** void report_incorrect()
+  66:main.c        **** {
+  54              		.loc 1 66 0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58 0000 10B5     		push	{r4, lr}
+  59              		.cfi_def_cfa_offset 8
+  60              		.cfi_offset 4, -8
+  61              		.cfi_offset 14, -4
+  67:main.c        ****     Pin_ERR_Write(LOW);
+  62              		.loc 1 67 0
+  63 0002 0020     		movs	r0, #0
+  64 0004 FFF7FEFF 		bl	Pin_ERR_Write
+  65              	.LVL1:
+  68:main.c        ****     CyDelay(5000);
+  66              		.loc 1 68 0
+  67 0008 0348     		ldr	r0, .L3
+  68 000a FFF7FEFF 		bl	CyDelay
+  69              	.LVL2:
+  69:main.c        ****     Pin_ERR_Write(HIGH);
+  70              		.loc 1 69 0
+  71 000e 0120     		movs	r0, #1
+  72 0010 FFF7FEFF 		bl	Pin_ERR_Write
+  73              	.LVL3:
+  70:main.c        **** }
+  74              		.loc 1 70 0
+  75              		@ sp needed
+  76 0014 10BD     		pop	{r4, pc}
+  77              	.L4:
+  78 0016 C046     		.align	2
+  79              	.L3:
+  80 0018 88130000 		.word	5000
+  81              		.cfi_endproc
+  82              	.LFE38:
+  83              		.size	report_incorrect, .-report_incorrect
+  84              		.section	.text.report_correct,"ax",%progbits
+  85              		.align	2
+  86              		.global	report_correct
+  87              		.code	16
+  88              		.thumb_func
+  89              		.type	report_correct, %function
+  90              	report_correct:
+  91              	.LFB39:
+  71:main.c        **** 
+  72:main.c        **** void report_correct()
+  73:main.c        **** {
+  92              		.loc 1 73 0
+  93              		.cfi_startproc
+  94              		@ args = 0, pretend = 0, frame = 0
+  95              		@ frame_needed = 0, uses_anonymous_args = 0
+  96 0000 10B5     		push	{r4, lr}
+  97              		.cfi_def_cfa_offset 8
+  98              		.cfi_offset 4, -8
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 4
+
+
+  99              		.cfi_offset 14, -4
+  74:main.c        ****     Pin_OK_Write(LOW);
+ 100              		.loc 1 74 0
+ 101 0002 0020     		movs	r0, #0
+ 102 0004 FFF7FEFF 		bl	Pin_OK_Write
+ 103              	.LVL4:
+  75:main.c        ****     CyDelay(5000);
+ 104              		.loc 1 75 0
+ 105 0008 0348     		ldr	r0, .L6
+ 106 000a FFF7FEFF 		bl	CyDelay
+ 107              	.LVL5:
+  76:main.c        ****     Pin_OK_Write(HIGH);
+ 108              		.loc 1 76 0
+ 109 000e 0120     		movs	r0, #1
+ 110 0010 FFF7FEFF 		bl	Pin_OK_Write
+ 111              	.LVL6:
+  77:main.c        **** }
+ 112              		.loc 1 77 0
+ 113              		@ sp needed
+ 114 0014 10BD     		pop	{r4, pc}
+ 115              	.L7:
+ 116 0016 C046     		.align	2
+ 117              	.L6:
+ 118 0018 88130000 		.word	5000
+ 119              		.cfi_endproc
+ 120              	.LFE39:
+ 121              		.size	report_correct, .-report_correct
+ 122              		.section	.text.check,"ax",%progbits
+ 123              		.align	2
+ 124              		.global	check
+ 125              		.code	16
+ 126              		.thumb_func
+ 127              		.type	check, %function
+ 128              	check:
+ 129              	.LFB40:
+  78:main.c        **** 
+  79:main.c        **** int check()
+  80:main.c        **** {
+ 130              		.loc 1 80 0
+ 131              		.cfi_startproc
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134 0000 10B5     		push	{r4, lr}
+ 135              		.cfi_def_cfa_offset 8
+ 136              		.cfi_offset 4, -8
+ 137              		.cfi_offset 14, -4
+  81:main.c        ****     return (Eq_Reg_Read() & 0b1) == 0b1;
+ 138              		.loc 1 81 0
+ 139 0002 FFF7FEFF 		bl	Eq_Reg_Read
+ 140              	.LVL7:
+ 141 0006 0123     		movs	r3, #1
+ 142 0008 1840     		ands	r0, r3
+  82:main.c        **** }
+ 143              		.loc 1 82 0
+ 144              		@ sp needed
+ 145 000a 10BD     		pop	{r4, pc}
+ 146              		.cfi_endproc
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 5
+
+
+ 147              	.LFE40:
+ 148              		.size	check, .-check
+ 149              		.section	.text.next_seq,"ax",%progbits
+ 150              		.align	2
+ 151              		.global	next_seq
+ 152              		.code	16
+ 153              		.thumb_func
+ 154              		.type	next_seq, %function
+ 155              	next_seq:
+ 156              	.LFB41:
+  83:main.c        **** 
+  84:main.c        **** int next_seq(int *seq, int size, int max_number) {
+ 157              		.loc 1 84 0
+ 158              		.cfi_startproc
+ 159              		@ args = 0, pretend = 0, frame = 0
+ 160              		@ frame_needed = 0, uses_anonymous_args = 0
+ 161              	.LVL8:
+ 162 0000 70B5     		push	{r4, r5, r6, lr}
+ 163              		.cfi_def_cfa_offset 16
+ 164              		.cfi_offset 4, -16
+ 165              		.cfi_offset 5, -12
+ 166              		.cfi_offset 6, -8
+ 167              		.cfi_offset 14, -4
+ 168 0002 0500     		movs	r5, r0
+ 169 0004 1400     		movs	r4, r2
+  85:main.c        ****     if (size == 0) {
+ 170              		.loc 1 85 0
+ 171 0006 0029     		cmp	r1, #0
+ 172 0008 0FD0     		beq	.L12
+  86:main.c        ****         return 0;
+  87:main.c        ****     }
+  88:main.c        ****     if (!next_seq(seq + 1, size - 1, max_number)) {
+ 173              		.loc 1 88 0
+ 174 000a 0139     		subs	r1, r1, #1
+ 175              	.LVL9:
+ 176 000c 0430     		adds	r0, r0, #4
+ 177              	.LVL10:
+ 178 000e FFF7FEFF 		bl	next_seq
+ 179              	.LVL11:
+ 180 0012 0028     		cmp	r0, #0
+ 181 0014 0BD1     		bne	.L13
+  89:main.c        ****         if (seq[0] == max_number) {
+ 182              		.loc 1 89 0
+ 183 0016 2B68     		ldr	r3, [r5]
+ 184 0018 9C42     		cmp	r4, r3
+ 185 001a 02D1     		bne	.L11
+  90:main.c        ****             seq[0] = 0;
+ 186              		.loc 1 90 0
+ 187 001c 0023     		movs	r3, #0
+ 188 001e 2B60     		str	r3, [r5]
+  91:main.c        ****             return 0;
+ 189              		.loc 1 91 0
+ 190 0020 06E0     		b	.L10
+ 191              	.L11:
+  92:main.c        ****         } else {
+  93:main.c        ****             seq[0]++;
+ 192              		.loc 1 93 0
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 6
+
+
+ 193 0022 0133     		adds	r3, r3, #1
+ 194 0024 2B60     		str	r3, [r5]
+  94:main.c        ****             return 1;
+ 195              		.loc 1 94 0
+ 196 0026 0120     		movs	r0, #1
+ 197 0028 02E0     		b	.L10
+ 198              	.LVL12:
+ 199              	.L12:
+  86:main.c        ****     }
+ 200              		.loc 1 86 0
+ 201 002a 0020     		movs	r0, #0
+ 202              	.LVL13:
+ 203 002c 00E0     		b	.L10
+ 204              	.LVL14:
+ 205              	.L13:
+  95:main.c        ****         }
+  96:main.c        ****     }
+  97:main.c        ****     return 1;
+ 206              		.loc 1 97 0
+ 207 002e 0120     		movs	r0, #1
+ 208              	.L10:
+  98:main.c        **** }
+ 209              		.loc 1 98 0
+ 210              		@ sp needed
+ 211              	.LVL15:
+ 212              	.LVL16:
+ 213 0030 70BD     		pop	{r4, r5, r6, pc}
+ 214              		.cfi_endproc
+ 215              	.LFE41:
+ 216              		.size	next_seq, .-next_seq
+ 217 0032 C046     		.section	.text.main,"ax",%progbits
+ 218              		.align	2
+ 219              		.global	main
+ 220              		.code	16
+ 221              		.thumb_func
+ 222              		.type	main, %function
+ 223              	main:
+ 224              	.LFB36:
+  15:main.c        ****     CyGlobalIntEnable;
+ 225              		.loc 1 15 0
+ 226              		.cfi_startproc
+ 227              		@ args = 0, pretend = 0, frame = 24
+ 228              		@ frame_needed = 0, uses_anonymous_args = 0
+ 229 0000 70B5     		push	{r4, r5, r6, lr}
+ 230              		.cfi_def_cfa_offset 16
+ 231              		.cfi_offset 4, -16
+ 232              		.cfi_offset 5, -12
+ 233              		.cfi_offset 6, -8
+ 234              		.cfi_offset 14, -4
+ 235 0002 86B0     		sub	sp, sp, #24
+ 236              		.cfi_def_cfa_offset 40
+  16:main.c        ****     
+ 237              		.loc 1 16 0
+ 238              		.syntax divided
+ 239              	@ 16 "main.c" 1
+ 240 0004 62B6     		CPSIE   i
+ 241              	@ 0 "" 2
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 7
+
+
+  18:main.c        ****     
+ 242              		.loc 1 18 0
+ 243              		.thumb
+ 244              		.syntax unified
+ 245 0006 FFF7FEFF 		bl	UART_Start
+ 246              	.LVL17:
+  20:main.c        ****     Pin_ERR_Write(HIGH);
+ 247              		.loc 1 20 0
+ 248 000a 0120     		movs	r0, #1
+ 249 000c FFF7FEFF 		bl	Pin_OK_Write
+ 250              	.LVL18:
+  21:main.c        **** 
+ 251              		.loc 1 21 0
+ 252 0010 0120     		movs	r0, #1
+ 253 0012 FFF7FEFF 		bl	Pin_ERR_Write
+ 254              	.LVL19:
+ 255              	.L15:
+ 256              	.LBB2:
+  28:main.c        ****         C_Reg_Write(0b0);
+ 257              		.loc 1 28 0
+ 258 0016 0020     		movs	r0, #0
+ 259 0018 FFF7FEFF 		bl	D_Reg_Write
+ 260              	.LVL20:
+  29:main.c        ****         delay();
+ 261              		.loc 1 29 0
+ 262 001c 0020     		movs	r0, #0
+ 263 001e FFF7FEFF 		bl	C_Reg_Write
+ 264              	.LVL21:
+  30:main.c        ****         C_Reg_Write(0b1);
+ 265              		.loc 1 30 0
+ 266 0022 FFF7FEFF 		bl	delay
+ 267              	.LVL22:
+  31:main.c        ****         delay();
+ 268              		.loc 1 31 0
+ 269 0026 0120     		movs	r0, #1
+ 270 0028 FFF7FEFF 		bl	C_Reg_Write
+ 271              	.LVL23:
+  32:main.c        ****         if (!check()) {
+ 272              		.loc 1 32 0
+ 273 002c FFF7FEFF 		bl	delay
+ 274              	.LVL24:
+  33:main.c        ****             report_incorrect();
+ 275              		.loc 1 33 0
+ 276 0030 FFF7FEFF 		bl	check
+ 277              	.LVL25:
+ 278 0034 0028     		cmp	r0, #0
+ 279 0036 01D1     		bne	.L17
+  34:main.c        ****         }
+ 280              		.loc 1 34 0
+ 281 0038 FFF7FEFF 		bl	report_incorrect
+ 282              	.LVL26:
+ 283              	.L17:
+  36:main.c        ****         do {
+ 284              		.loc 1 36 0
+ 285 003c 1822     		movs	r2, #24
+ 286 003e 0021     		movs	r1, #0
+ 287 0040 6846     		mov	r0, sp
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 8
+
+
+ 288 0042 FFF7FEFF 		bl	memset
+ 289              	.LVL27:
+  27:main.c        ****         D_Reg_Write(0b00000000);
+ 290              		.loc 1 27 0
+ 291 0046 0124     		movs	r4, #1
+  26:main.c        ****         int cur_c = 1;
+ 292              		.loc 1 26 0
+ 293 0048 0026     		movs	r6, #0
+ 294              	.LVL28:
+ 295              	.L23:
+ 296              	.LBB3:
+  38:main.c        ****                 int action_code = seq_of_actions[num_action];
+ 297              		.loc 1 38 0
+ 298 004a 0025     		movs	r5, #0
+ 299 004c 1CE0     		b	.L18
+ 300              	.LVL29:
+ 301              	.L22:
+ 302              	.LBB4:
+  39:main.c        ****                 if (action_code == 8) {
+ 303              		.loc 1 39 0
+ 304 004e AB00     		lsls	r3, r5, #2
+ 305 0050 6A46     		mov	r2, sp
+ 306 0052 9B58     		ldr	r3, [r3, r2]
+ 307              	.LVL30:
+  40:main.c        ****                     cur_c = !cur_c;
+ 308              		.loc 1 40 0
+ 309 0054 082B     		cmp	r3, #8
+ 310 0056 03D1     		bne	.L19
+  41:main.c        ****                 } else {
+ 311              		.loc 1 41 0
+ 312 0058 6342     		rsbs	r3, r4, #0
+ 313 005a 5C41     		adcs	r4, r4, r3
+ 314              	.LVL31:
+ 315 005c E4B2     		uxtb	r4, r4
+ 316              	.LVL32:
+ 317 005e 03E0     		b	.L20
+ 318              	.LVL33:
+ 319              	.L19:
+  43:main.c        ****                 }
+ 320              		.loc 1 43 0
+ 321 0060 0120     		movs	r0, #1
+ 322 0062 9840     		lsls	r0, r0, r3
+ 323 0064 7040     		eors	r0, r6
+ 324 0066 C6B2     		uxtb	r6, r0
+ 325              	.LVL34:
+ 326              	.L20:
+  45:main.c        ****                 C_Reg_Write(cur_c);
+ 327              		.loc 1 45 0
+ 328 0068 3000     		movs	r0, r6
+ 329 006a FFF7FEFF 		bl	D_Reg_Write
+ 330              	.LVL35:
+  46:main.c        ****                 delay();
+ 331              		.loc 1 46 0
+ 332 006e E0B2     		uxtb	r0, r4
+ 333 0070 FFF7FEFF 		bl	C_Reg_Write
+ 334              	.LVL36:
+  47:main.c        ****                 
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 9
+
+
+ 335              		.loc 1 47 0
+ 336 0074 FFF7FEFF 		bl	delay
+ 337              	.LVL37:
+  50:main.c        ****                     report_incorrect();
+ 338              		.loc 1 50 0
+ 339 0078 FFF7FEFF 		bl	check
+ 340              	.LVL38:
+ 341 007c 0028     		cmp	r0, #0
+ 342 007e 02D1     		bne	.L21
+  51:main.c        ****                     goto start_outer_loop;
+ 343              		.loc 1 51 0
+ 344 0080 FFF7FEFF 		bl	report_incorrect
+ 345              	.LVL39:
+  52:main.c        ****                 }
+ 346              		.loc 1 52 0
+ 347 0084 C7E7     		b	.L15
+ 348              	.L21:
+ 349              	.LBE4:
+  38:main.c        ****                 int action_code = seq_of_actions[num_action];
+ 350              		.loc 1 38 0 discriminator 2
+ 351 0086 0135     		adds	r5, r5, #1
+ 352              	.LVL40:
+ 353              	.L18:
+  38:main.c        ****                 int action_code = seq_of_actions[num_action];
+ 354              		.loc 1 38 0 is_stmt 0 discriminator 1
+ 355 0088 052D     		cmp	r5, #5
+ 356 008a E0DD     		ble	.L22
+ 357              	.LBE3:
+  55:main.c        ****         report_correct();
+ 358              		.loc 1 55 0 is_stmt 1
+ 359 008c 0822     		movs	r2, #8
+ 360 008e 0621     		movs	r1, #6
+ 361 0090 6846     		mov	r0, sp
+ 362 0092 FFF7FEFF 		bl	next_seq
+ 363              	.LVL41:
+ 364 0096 0028     		cmp	r0, #0
+ 365 0098 D7D1     		bne	.L23
+  56:main.c        ****     }
+ 366              		.loc 1 56 0
+ 367 009a FFF7FEFF 		bl	report_correct
+ 368              	.LVL42:
+ 369              	.L16:
+ 370              	.LBE2:
+  57:main.c        **** }
+ 371              		.loc 1 57 0
+ 372 009e BAE7     		b	.L15
+ 373              		.cfi_endproc
+ 374              	.LFE36:
+ 375              		.size	main, .-main
+ 376              		.text
+ 377              	.Letext0:
+ 378              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 379              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 380              		.file 4 "Generated_Source\\PSoC4/CyLib.h"
+ 381              		.file 5 "Generated_Source\\PSoC4/Pin_ERR.h"
+ 382              		.file 6 "Generated_Source\\PSoC4/Pin_OK.h"
+ 383              		.file 7 "Generated_Source\\PSoC4/Eq_Reg.h"
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 10
+
+
+ 384              		.file 8 "Generated_Source\\PSoC4/D_Reg.h"
+ 385              		.file 9 "Generated_Source\\PSoC4/C_Reg.h"
+ 386              		.file 10 "Generated_Source\\PSoC4/UART.h"
+ 387              		.section	.debug_info,"",%progbits
+ 388              	.Ldebug_info0:
+ 389 0000 05040000 		.4byte	0x405
+ 390 0004 0400     		.2byte	0x4
+ 391 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 392 000a 04       		.byte	0x4
+ 393 000b 01       		.uleb128 0x1
+ 394 000c 64010000 		.4byte	.LASF34
+ 395 0010 0C       		.byte	0xc
+ 396 0011 09020000 		.4byte	.LASF35
+ 397 0015 74000000 		.4byte	.LASF36
+ 398 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 399 001d 00000000 		.4byte	0
+ 400 0021 00000000 		.4byte	.Ldebug_line0
+ 401 0025 02       		.uleb128 0x2
+ 402 0026 01       		.byte	0x1
+ 403 0027 06       		.byte	0x6
+ 404 0028 56000000 		.4byte	.LASF0
+ 405 002c 03       		.uleb128 0x3
+ 406 002d 15000000 		.4byte	.LASF9
+ 407 0031 02       		.byte	0x2
+ 408 0032 1D       		.byte	0x1d
+ 409 0033 37000000 		.4byte	0x37
+ 410 0037 02       		.uleb128 0x2
+ 411 0038 01       		.byte	0x1
+ 412 0039 08       		.byte	0x8
+ 413 003a 0B010000 		.4byte	.LASF1
+ 414 003e 02       		.uleb128 0x2
+ 415 003f 02       		.byte	0x2
+ 416 0040 05       		.byte	0x5
+ 417 0041 21020000 		.4byte	.LASF2
+ 418 0045 02       		.uleb128 0x2
+ 419 0046 02       		.byte	0x2
+ 420 0047 07       		.byte	0x7
+ 421 0048 D4000000 		.4byte	.LASF3
+ 422 004c 02       		.uleb128 0x2
+ 423 004d 04       		.byte	0x4
+ 424 004e 05       		.byte	0x5
+ 425 004f 3C020000 		.4byte	.LASF4
+ 426 0053 02       		.uleb128 0x2
+ 427 0054 04       		.byte	0x4
+ 428 0055 07       		.byte	0x7
+ 429 0056 C2000000 		.4byte	.LASF5
+ 430 005a 02       		.uleb128 0x2
+ 431 005b 08       		.byte	0x8
+ 432 005c 05       		.byte	0x5
+ 433 005d FB010000 		.4byte	.LASF6
+ 434 0061 02       		.uleb128 0x2
+ 435 0062 08       		.byte	0x8
+ 436 0063 07       		.byte	0x7
+ 437 0064 39010000 		.4byte	.LASF7
+ 438 0068 04       		.uleb128 0x4
+ 439 0069 04       		.byte	0x4
+ 440 006a 05       		.byte	0x5
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 11
+
+
+ 441 006b 696E7400 		.ascii	"int\000"
+ 442 006f 02       		.uleb128 0x2
+ 443 0070 04       		.byte	0x4
+ 444 0071 07       		.byte	0x7
+ 445 0072 2C010000 		.4byte	.LASF8
+ 446 0076 03       		.uleb128 0x3
+ 447 0077 50010000 		.4byte	.LASF10
+ 448 007b 03       		.byte	0x3
+ 449 007c 18       		.byte	0x18
+ 450 007d 2C000000 		.4byte	0x2c
+ 451 0081 02       		.uleb128 0x2
+ 452 0082 04       		.byte	0x4
+ 453 0083 04       		.byte	0x4
+ 454 0084 50000000 		.4byte	.LASF11
+ 455 0088 02       		.uleb128 0x2
+ 456 0089 08       		.byte	0x8
+ 457 008a 04       		.byte	0x4
+ 458 008b 20010000 		.4byte	.LASF12
+ 459 008f 02       		.uleb128 0x2
+ 460 0090 01       		.byte	0x1
+ 461 0091 08       		.byte	0x8
+ 462 0092 10020000 		.4byte	.LASF13
+ 463 0096 02       		.uleb128 0x2
+ 464 0097 08       		.byte	0x8
+ 465 0098 04       		.byte	0x4
+ 466 0099 54020000 		.4byte	.LASF14
+ 467 009d 02       		.uleb128 0x2
+ 468 009e 04       		.byte	0x4
+ 469 009f 07       		.byte	0x7
+ 470 00a0 F2010000 		.4byte	.LASF15
+ 471 00a4 05       		.uleb128 0x5
+ 472 00a5 62000000 		.4byte	.LASF16
+ 473 00a9 01       		.byte	0x1
+ 474 00aa 3C       		.byte	0x3c
+ 475 00ab 00000000 		.4byte	.LFB37
+ 476 00af 0A000000 		.4byte	.LFE37-.LFB37
+ 477 00b3 01       		.uleb128 0x1
+ 478 00b4 9C       		.byte	0x9c
+ 479 00b5 C9000000 		.4byte	0xc9
+ 480 00b9 06       		.uleb128 0x6
+ 481 00ba 08000000 		.4byte	.LVL0
+ 482 00be A7030000 		.4byte	0x3a7
+ 483 00c2 07       		.uleb128 0x7
+ 484 00c3 01       		.uleb128 0x1
+ 485 00c4 50       		.byte	0x50
+ 486 00c5 01       		.uleb128 0x1
+ 487 00c6 31       		.byte	0x31
+ 488 00c7 00       		.byte	0
+ 489 00c8 00       		.byte	0
+ 490 00c9 05       		.uleb128 0x5
+ 491 00ca 3F000000 		.4byte	.LASF17
+ 492 00ce 01       		.byte	0x1
+ 493 00cf 41       		.byte	0x41
+ 494 00d0 00000000 		.4byte	.LFB38
+ 495 00d4 1C000000 		.4byte	.LFE38-.LFB38
+ 496 00d8 01       		.uleb128 0x1
+ 497 00d9 9C       		.byte	0x9c
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 12
+
+
+ 498 00da 16010000 		.4byte	0x116
+ 499 00de 08       		.uleb128 0x8
+ 500 00df 08000000 		.4byte	.LVL1
+ 501 00e3 B2030000 		.4byte	0x3b2
+ 502 00e7 F1000000 		.4byte	0xf1
+ 503 00eb 07       		.uleb128 0x7
+ 504 00ec 01       		.uleb128 0x1
+ 505 00ed 50       		.byte	0x50
+ 506 00ee 01       		.uleb128 0x1
+ 507 00ef 30       		.byte	0x30
+ 508 00f0 00       		.byte	0
+ 509 00f1 08       		.uleb128 0x8
+ 510 00f2 0E000000 		.4byte	.LVL2
+ 511 00f6 BD030000 		.4byte	0x3bd
+ 512 00fa 06010000 		.4byte	0x106
+ 513 00fe 07       		.uleb128 0x7
+ 514 00ff 01       		.uleb128 0x1
+ 515 0100 50       		.byte	0x50
+ 516 0101 03       		.uleb128 0x3
+ 517 0102 0A       		.byte	0xa
+ 518 0103 8813     		.2byte	0x1388
+ 519 0105 00       		.byte	0
+ 520 0106 06       		.uleb128 0x6
+ 521 0107 14000000 		.4byte	.LVL3
+ 522 010b B2030000 		.4byte	0x3b2
+ 523 010f 07       		.uleb128 0x7
+ 524 0110 01       		.uleb128 0x1
+ 525 0111 50       		.byte	0x50
+ 526 0112 01       		.uleb128 0x1
+ 527 0113 31       		.byte	0x31
+ 528 0114 00       		.byte	0
+ 529 0115 00       		.byte	0
+ 530 0116 05       		.uleb128 0x5
+ 531 0117 1F000000 		.4byte	.LASF18
+ 532 011b 01       		.byte	0x1
+ 533 011c 48       		.byte	0x48
+ 534 011d 00000000 		.4byte	.LFB39
+ 535 0121 1C000000 		.4byte	.LFE39-.LFB39
+ 536 0125 01       		.uleb128 0x1
+ 537 0126 9C       		.byte	0x9c
+ 538 0127 63010000 		.4byte	0x163
+ 539 012b 08       		.uleb128 0x8
+ 540 012c 08000000 		.4byte	.LVL4
+ 541 0130 C8030000 		.4byte	0x3c8
+ 542 0134 3E010000 		.4byte	0x13e
+ 543 0138 07       		.uleb128 0x7
+ 544 0139 01       		.uleb128 0x1
+ 545 013a 50       		.byte	0x50
+ 546 013b 01       		.uleb128 0x1
+ 547 013c 30       		.byte	0x30
+ 548 013d 00       		.byte	0
+ 549 013e 08       		.uleb128 0x8
+ 550 013f 0E000000 		.4byte	.LVL5
+ 551 0143 BD030000 		.4byte	0x3bd
+ 552 0147 53010000 		.4byte	0x153
+ 553 014b 07       		.uleb128 0x7
+ 554 014c 01       		.uleb128 0x1
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 13
+
+
+ 555 014d 50       		.byte	0x50
+ 556 014e 03       		.uleb128 0x3
+ 557 014f 0A       		.byte	0xa
+ 558 0150 8813     		.2byte	0x1388
+ 559 0152 00       		.byte	0
+ 560 0153 06       		.uleb128 0x6
+ 561 0154 14000000 		.4byte	.LVL6
+ 562 0158 C8030000 		.4byte	0x3c8
+ 563 015c 07       		.uleb128 0x7
+ 564 015d 01       		.uleb128 0x1
+ 565 015e 50       		.byte	0x50
+ 566 015f 01       		.uleb128 0x1
+ 567 0160 31       		.byte	0x31
+ 568 0161 00       		.byte	0
+ 569 0162 00       		.byte	0
+ 570 0163 09       		.uleb128 0x9
+ 571 0164 39000000 		.4byte	.LASF37
+ 572 0168 01       		.byte	0x1
+ 573 0169 4F       		.byte	0x4f
+ 574 016a 68000000 		.4byte	0x68
+ 575 016e 00000000 		.4byte	.LFB40
+ 576 0172 0C000000 		.4byte	.LFE40-.LFB40
+ 577 0176 01       		.uleb128 0x1
+ 578 0177 9C       		.byte	0x9c
+ 579 0178 86010000 		.4byte	0x186
+ 580 017c 0A       		.uleb128 0xa
+ 581 017d 06000000 		.4byte	.LVL7
+ 582 0181 D3030000 		.4byte	0x3d3
+ 583 0185 00       		.byte	0
+ 584 0186 0B       		.uleb128 0xb
+ 585 0187 00000000 		.4byte	.LASF38
+ 586 018b 01       		.byte	0x1
+ 587 018c 54       		.byte	0x54
+ 588 018d 68000000 		.4byte	0x68
+ 589 0191 00000000 		.4byte	.LFB41
+ 590 0195 32000000 		.4byte	.LFE41-.LFB41
+ 591 0199 01       		.uleb128 0x1
+ 592 019a 9C       		.byte	0x9c
+ 593 019b EC010000 		.4byte	0x1ec
+ 594 019f 0C       		.uleb128 0xc
+ 595 01a0 73657100 		.ascii	"seq\000"
+ 596 01a4 01       		.byte	0x1
+ 597 01a5 54       		.byte	0x54
+ 598 01a6 EC010000 		.4byte	0x1ec
+ 599 01aa 00000000 		.4byte	.LLST0
+ 600 01ae 0D       		.uleb128 0xd
+ 601 01af 6E020000 		.4byte	.LASF19
+ 602 01b3 01       		.byte	0x1
+ 603 01b4 54       		.byte	0x54
+ 604 01b5 68000000 		.4byte	0x68
+ 605 01b9 42000000 		.4byte	.LLST1
+ 606 01bd 0D       		.uleb128 0xd
+ 607 01be 2E000000 		.4byte	.LASF20
+ 608 01c2 01       		.byte	0x1
+ 609 01c3 54       		.byte	0x54
+ 610 01c4 68000000 		.4byte	0x68
+ 611 01c8 89000000 		.4byte	.LLST2
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 14
+
+
+ 612 01cc 06       		.uleb128 0x6
+ 613 01cd 12000000 		.4byte	.LVL11
+ 614 01d1 86010000 		.4byte	0x186
+ 615 01d5 07       		.uleb128 0x7
+ 616 01d6 01       		.uleb128 0x1
+ 617 01d7 50       		.byte	0x50
+ 618 01d8 02       		.uleb128 0x2
+ 619 01d9 75       		.byte	0x75
+ 620 01da 04       		.sleb128 4
+ 621 01db 07       		.uleb128 0x7
+ 622 01dc 01       		.uleb128 0x1
+ 623 01dd 51       		.byte	0x51
+ 624 01de 05       		.uleb128 0x5
+ 625 01df F3       		.byte	0xf3
+ 626 01e0 01       		.uleb128 0x1
+ 627 01e1 51       		.byte	0x51
+ 628 01e2 31       		.byte	0x31
+ 629 01e3 1C       		.byte	0x1c
+ 630 01e4 07       		.uleb128 0x7
+ 631 01e5 01       		.uleb128 0x1
+ 632 01e6 52       		.byte	0x52
+ 633 01e7 02       		.uleb128 0x2
+ 634 01e8 74       		.byte	0x74
+ 635 01e9 00       		.sleb128 0
+ 636 01ea 00       		.byte	0
+ 637 01eb 00       		.byte	0
+ 638 01ec 0E       		.uleb128 0xe
+ 639 01ed 04       		.byte	0x4
+ 640 01ee 68000000 		.4byte	0x68
+ 641 01f2 0F       		.uleb128 0xf
+ 642 01f3 27010000 		.4byte	.LASF39
+ 643 01f7 01       		.byte	0x1
+ 644 01f8 0E       		.byte	0xe
+ 645 01f9 68000000 		.4byte	0x68
+ 646 01fd 00000000 		.4byte	.LFB36
+ 647 0201 A0000000 		.4byte	.LFE36-.LFB36
+ 648 0205 01       		.uleb128 0x1
+ 649 0206 9C       		.byte	0x9c
+ 650 0207 97030000 		.4byte	0x397
+ 651 020b 10       		.uleb128 0x10
+ 652 020c 2B020000 		.4byte	.LASF40
+ 653 0210 01       		.byte	0x1
+ 654 0211 19       		.byte	0x19
+ 655 0212 9E000000 		.4byte	.L16
+ 656 0216 11       		.uleb128 0x11
+ 657 0217 16000000 		.4byte	.LBB2
+ 658 021b 88000000 		.4byte	.LBE2-.LBB2
+ 659 021f 6B030000 		.4byte	0x36b
+ 660 0223 12       		.uleb128 0x12
+ 661 0224 6E000000 		.4byte	.LASF21
+ 662 0228 01       		.byte	0x1
+ 663 0229 1A       		.byte	0x1a
+ 664 022a 76000000 		.4byte	0x76
+ 665 022e CB000000 		.4byte	.LLST3
+ 666 0232 12       		.uleb128 0x12
+ 667 0233 68000000 		.4byte	.LASF22
+ 668 0237 01       		.byte	0x1
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 15
+
+
+ 669 0238 1B       		.byte	0x1b
+ 670 0239 68000000 		.4byte	0x68
+ 671 023d EA000000 		.4byte	.LLST4
+ 672 0241 13       		.uleb128 0x13
+ 673 0242 45020000 		.4byte	.LASF23
+ 674 0246 01       		.byte	0x1
+ 675 0247 24       		.byte	0x24
+ 676 0248 97030000 		.4byte	0x397
+ 677 024c 02       		.uleb128 0x2
+ 678 024d 91       		.byte	0x91
+ 679 024e 58       		.sleb128 -40
+ 680 024f 11       		.uleb128 0x11
+ 681 0250 4A000000 		.4byte	.LBB3
+ 682 0254 42000000 		.4byte	.LBE3-.LBB3
+ 683 0258 C8020000 		.4byte	0x2c8
+ 684 025c 12       		.uleb128 0x12
+ 685 025d A9000000 		.4byte	.LASF24
+ 686 0261 01       		.byte	0x1
+ 687 0262 26       		.byte	0x26
+ 688 0263 68000000 		.4byte	0x68
+ 689 0267 14010000 		.4byte	.LLST5
+ 690 026b 14       		.uleb128 0x14
+ 691 026c 4E000000 		.4byte	.LBB4
+ 692 0270 38000000 		.4byte	.LBE4-.LBB4
+ 693 0274 12       		.uleb128 0x12
+ 694 0275 FF000000 		.4byte	.LASF25
+ 695 0279 01       		.byte	0x1
+ 696 027a 27       		.byte	0x27
+ 697 027b 68000000 		.4byte	0x68
+ 698 027f 33010000 		.4byte	.LLST6
+ 699 0283 08       		.uleb128 0x8
+ 700 0284 6E000000 		.4byte	.LVL35
+ 701 0288 DE030000 		.4byte	0x3de
+ 702 028c 97020000 		.4byte	0x297
+ 703 0290 07       		.uleb128 0x7
+ 704 0291 01       		.uleb128 0x1
+ 705 0292 50       		.byte	0x50
+ 706 0293 02       		.uleb128 0x2
+ 707 0294 76       		.byte	0x76
+ 708 0295 00       		.sleb128 0
+ 709 0296 00       		.byte	0
+ 710 0297 08       		.uleb128 0x8
+ 711 0298 74000000 		.4byte	.LVL36
+ 712 029c E9030000 		.4byte	0x3e9
+ 713 02a0 AB020000 		.4byte	0x2ab
+ 714 02a4 07       		.uleb128 0x7
+ 715 02a5 01       		.uleb128 0x1
+ 716 02a6 50       		.byte	0x50
+ 717 02a7 02       		.uleb128 0x2
+ 718 02a8 74       		.byte	0x74
+ 719 02a9 00       		.sleb128 0
+ 720 02aa 00       		.byte	0
+ 721 02ab 0A       		.uleb128 0xa
+ 722 02ac 78000000 		.4byte	.LVL37
+ 723 02b0 A4000000 		.4byte	0xa4
+ 724 02b4 0A       		.uleb128 0xa
+ 725 02b5 7C000000 		.4byte	.LVL38
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 16
+
+
+ 726 02b9 63010000 		.4byte	0x163
+ 727 02bd 0A       		.uleb128 0xa
+ 728 02be 84000000 		.4byte	.LVL39
+ 729 02c2 C9000000 		.4byte	0xc9
+ 730 02c6 00       		.byte	0
+ 731 02c7 00       		.byte	0
+ 732 02c8 08       		.uleb128 0x8
+ 733 02c9 1C000000 		.4byte	.LVL20
+ 734 02cd DE030000 		.4byte	0x3de
+ 735 02d1 DB020000 		.4byte	0x2db
+ 736 02d5 07       		.uleb128 0x7
+ 737 02d6 01       		.uleb128 0x1
+ 738 02d7 50       		.byte	0x50
+ 739 02d8 01       		.uleb128 0x1
+ 740 02d9 30       		.byte	0x30
+ 741 02da 00       		.byte	0
+ 742 02db 08       		.uleb128 0x8
+ 743 02dc 22000000 		.4byte	.LVL21
+ 744 02e0 E9030000 		.4byte	0x3e9
+ 745 02e4 EE020000 		.4byte	0x2ee
+ 746 02e8 07       		.uleb128 0x7
+ 747 02e9 01       		.uleb128 0x1
+ 748 02ea 50       		.byte	0x50
+ 749 02eb 01       		.uleb128 0x1
+ 750 02ec 30       		.byte	0x30
+ 751 02ed 00       		.byte	0
+ 752 02ee 0A       		.uleb128 0xa
+ 753 02ef 26000000 		.4byte	.LVL22
+ 754 02f3 A4000000 		.4byte	0xa4
+ 755 02f7 08       		.uleb128 0x8
+ 756 02f8 2C000000 		.4byte	.LVL23
+ 757 02fc E9030000 		.4byte	0x3e9
+ 758 0300 0A030000 		.4byte	0x30a
+ 759 0304 07       		.uleb128 0x7
+ 760 0305 01       		.uleb128 0x1
+ 761 0306 50       		.byte	0x50
+ 762 0307 01       		.uleb128 0x1
+ 763 0308 31       		.byte	0x31
+ 764 0309 00       		.byte	0
+ 765 030a 0A       		.uleb128 0xa
+ 766 030b 30000000 		.4byte	.LVL24
+ 767 030f A4000000 		.4byte	0xa4
+ 768 0313 0A       		.uleb128 0xa
+ 769 0314 34000000 		.4byte	.LVL25
+ 770 0318 63010000 		.4byte	0x163
+ 771 031c 0A       		.uleb128 0xa
+ 772 031d 3C000000 		.4byte	.LVL26
+ 773 0321 C9000000 		.4byte	0xc9
+ 774 0325 08       		.uleb128 0x8
+ 775 0326 46000000 		.4byte	.LVL27
+ 776 032a F4030000 		.4byte	0x3f4
+ 777 032e 43030000 		.4byte	0x343
+ 778 0332 07       		.uleb128 0x7
+ 779 0333 01       		.uleb128 0x1
+ 780 0334 50       		.byte	0x50
+ 781 0335 02       		.uleb128 0x2
+ 782 0336 7D       		.byte	0x7d
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 17
+
+
+ 783 0337 00       		.sleb128 0
+ 784 0338 07       		.uleb128 0x7
+ 785 0339 01       		.uleb128 0x1
+ 786 033a 51       		.byte	0x51
+ 787 033b 01       		.uleb128 0x1
+ 788 033c 30       		.byte	0x30
+ 789 033d 07       		.uleb128 0x7
+ 790 033e 01       		.uleb128 0x1
+ 791 033f 52       		.byte	0x52
+ 792 0340 01       		.uleb128 0x1
+ 793 0341 48       		.byte	0x48
+ 794 0342 00       		.byte	0
+ 795 0343 08       		.uleb128 0x8
+ 796 0344 96000000 		.4byte	.LVL41
+ 797 0348 86010000 		.4byte	0x186
+ 798 034c 61030000 		.4byte	0x361
+ 799 0350 07       		.uleb128 0x7
+ 800 0351 01       		.uleb128 0x1
+ 801 0352 50       		.byte	0x50
+ 802 0353 02       		.uleb128 0x2
+ 803 0354 7D       		.byte	0x7d
+ 804 0355 00       		.sleb128 0
+ 805 0356 07       		.uleb128 0x7
+ 806 0357 01       		.uleb128 0x1
+ 807 0358 51       		.byte	0x51
+ 808 0359 01       		.uleb128 0x1
+ 809 035a 36       		.byte	0x36
+ 810 035b 07       		.uleb128 0x7
+ 811 035c 01       		.uleb128 0x1
+ 812 035d 52       		.byte	0x52
+ 813 035e 01       		.uleb128 0x1
+ 814 035f 38       		.byte	0x38
+ 815 0360 00       		.byte	0
+ 816 0361 0A       		.uleb128 0xa
+ 817 0362 9E000000 		.4byte	.LVL42
+ 818 0366 16010000 		.4byte	0x116
+ 819 036a 00       		.byte	0
+ 820 036b 0A       		.uleb128 0xa
+ 821 036c 0A000000 		.4byte	.LVL17
+ 822 0370 FD030000 		.4byte	0x3fd
+ 823 0374 08       		.uleb128 0x8
+ 824 0375 10000000 		.4byte	.LVL18
+ 825 0379 C8030000 		.4byte	0x3c8
+ 826 037d 87030000 		.4byte	0x387
+ 827 0381 07       		.uleb128 0x7
+ 828 0382 01       		.uleb128 0x1
+ 829 0383 50       		.byte	0x50
+ 830 0384 01       		.uleb128 0x1
+ 831 0385 31       		.byte	0x31
+ 832 0386 00       		.byte	0
+ 833 0387 06       		.uleb128 0x6
+ 834 0388 16000000 		.4byte	.LVL19
+ 835 038c B2030000 		.4byte	0x3b2
+ 836 0390 07       		.uleb128 0x7
+ 837 0391 01       		.uleb128 0x1
+ 838 0392 50       		.byte	0x50
+ 839 0393 01       		.uleb128 0x1
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 18
+
+
+ 840 0394 31       		.byte	0x31
+ 841 0395 00       		.byte	0
+ 842 0396 00       		.byte	0
+ 843 0397 15       		.uleb128 0x15
+ 844 0398 68000000 		.4byte	0x68
+ 845 039c A7030000 		.4byte	0x3a7
+ 846 03a0 16       		.uleb128 0x16
+ 847 03a1 9D000000 		.4byte	0x9d
+ 848 03a5 05       		.byte	0x5
+ 849 03a6 00       		.byte	0
+ 850 03a7 17       		.uleb128 0x17
+ 851 03a8 B4000000 		.4byte	.LASF26
+ 852 03ac B4000000 		.4byte	.LASF26
+ 853 03b0 04       		.byte	0x4
+ 854 03b1 EF       		.byte	0xef
+ 855 03b2 17       		.uleb128 0x17
+ 856 03b3 60020000 		.4byte	.LASF27
+ 857 03b7 60020000 		.4byte	.LASF27
+ 858 03bb 05       		.byte	0x5
+ 859 03bc 33       		.byte	0x33
+ 860 03bd 17       		.uleb128 0x17
+ 861 03be 73020000 		.4byte	.LASF28
+ 862 03c2 73020000 		.4byte	.LASF28
+ 863 03c6 04       		.byte	0x4
+ 864 03c7 EC       		.byte	0xec
+ 865 03c8 17       		.uleb128 0x17
+ 866 03c9 F2000000 		.4byte	.LASF29
+ 867 03cd F2000000 		.4byte	.LASF29
+ 868 03d1 06       		.byte	0x6
+ 869 03d2 33       		.byte	0x33
+ 870 03d3 17       		.uleb128 0x17
+ 871 03d4 58010000 		.4byte	.LASF30
+ 872 03d8 58010000 		.4byte	.LASF30
+ 873 03dc 07       		.byte	0x7
+ 874 03dd 30       		.byte	0x30
+ 875 03de 17       		.uleb128 0x17
+ 876 03df 15020000 		.4byte	.LASF31
+ 877 03e3 15020000 		.4byte	.LASF31
+ 878 03e7 08       		.byte	0x8
+ 879 03e8 2F       		.byte	0x2f
+ 880 03e9 17       		.uleb128 0x17
+ 881 03ea 09000000 		.4byte	.LASF32
+ 882 03ee 09000000 		.4byte	.LASF32
+ 883 03f2 09       		.byte	0x9
+ 884 03f3 2F       		.byte	0x2f
+ 885 03f4 18       		.uleb128 0x18
+ 886 03f5 19010000 		.4byte	.LASF41
+ 887 03f9 19010000 		.4byte	.LASF41
+ 888 03fd 17       		.uleb128 0x17
+ 889 03fe E7000000 		.4byte	.LASF33
+ 890 0402 E7000000 		.4byte	.LASF33
+ 891 0406 0A       		.byte	0xa
+ 892 0407 72       		.byte	0x72
+ 893 0408 00       		.byte	0
+ 894              		.section	.debug_abbrev,"",%progbits
+ 895              	.Ldebug_abbrev0:
+ 896 0000 01       		.uleb128 0x1
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 19
+
+
+ 897 0001 11       		.uleb128 0x11
+ 898 0002 01       		.byte	0x1
+ 899 0003 25       		.uleb128 0x25
+ 900 0004 0E       		.uleb128 0xe
+ 901 0005 13       		.uleb128 0x13
+ 902 0006 0B       		.uleb128 0xb
+ 903 0007 03       		.uleb128 0x3
+ 904 0008 0E       		.uleb128 0xe
+ 905 0009 1B       		.uleb128 0x1b
+ 906 000a 0E       		.uleb128 0xe
+ 907 000b 55       		.uleb128 0x55
+ 908 000c 17       		.uleb128 0x17
+ 909 000d 11       		.uleb128 0x11
+ 910 000e 01       		.uleb128 0x1
+ 911 000f 10       		.uleb128 0x10
+ 912 0010 17       		.uleb128 0x17
+ 913 0011 00       		.byte	0
+ 914 0012 00       		.byte	0
+ 915 0013 02       		.uleb128 0x2
+ 916 0014 24       		.uleb128 0x24
+ 917 0015 00       		.byte	0
+ 918 0016 0B       		.uleb128 0xb
+ 919 0017 0B       		.uleb128 0xb
+ 920 0018 3E       		.uleb128 0x3e
+ 921 0019 0B       		.uleb128 0xb
+ 922 001a 03       		.uleb128 0x3
+ 923 001b 0E       		.uleb128 0xe
+ 924 001c 00       		.byte	0
+ 925 001d 00       		.byte	0
+ 926 001e 03       		.uleb128 0x3
+ 927 001f 16       		.uleb128 0x16
+ 928 0020 00       		.byte	0
+ 929 0021 03       		.uleb128 0x3
+ 930 0022 0E       		.uleb128 0xe
+ 931 0023 3A       		.uleb128 0x3a
+ 932 0024 0B       		.uleb128 0xb
+ 933 0025 3B       		.uleb128 0x3b
+ 934 0026 0B       		.uleb128 0xb
+ 935 0027 49       		.uleb128 0x49
+ 936 0028 13       		.uleb128 0x13
+ 937 0029 00       		.byte	0
+ 938 002a 00       		.byte	0
+ 939 002b 04       		.uleb128 0x4
+ 940 002c 24       		.uleb128 0x24
+ 941 002d 00       		.byte	0
+ 942 002e 0B       		.uleb128 0xb
+ 943 002f 0B       		.uleb128 0xb
+ 944 0030 3E       		.uleb128 0x3e
+ 945 0031 0B       		.uleb128 0xb
+ 946 0032 03       		.uleb128 0x3
+ 947 0033 08       		.uleb128 0x8
+ 948 0034 00       		.byte	0
+ 949 0035 00       		.byte	0
+ 950 0036 05       		.uleb128 0x5
+ 951 0037 2E       		.uleb128 0x2e
+ 952 0038 01       		.byte	0x1
+ 953 0039 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 20
+
+
+ 954 003a 19       		.uleb128 0x19
+ 955 003b 03       		.uleb128 0x3
+ 956 003c 0E       		.uleb128 0xe
+ 957 003d 3A       		.uleb128 0x3a
+ 958 003e 0B       		.uleb128 0xb
+ 959 003f 3B       		.uleb128 0x3b
+ 960 0040 0B       		.uleb128 0xb
+ 961 0041 11       		.uleb128 0x11
+ 962 0042 01       		.uleb128 0x1
+ 963 0043 12       		.uleb128 0x12
+ 964 0044 06       		.uleb128 0x6
+ 965 0045 40       		.uleb128 0x40
+ 966 0046 18       		.uleb128 0x18
+ 967 0047 9742     		.uleb128 0x2117
+ 968 0049 19       		.uleb128 0x19
+ 969 004a 01       		.uleb128 0x1
+ 970 004b 13       		.uleb128 0x13
+ 971 004c 00       		.byte	0
+ 972 004d 00       		.byte	0
+ 973 004e 06       		.uleb128 0x6
+ 974 004f 898201   		.uleb128 0x4109
+ 975 0052 01       		.byte	0x1
+ 976 0053 11       		.uleb128 0x11
+ 977 0054 01       		.uleb128 0x1
+ 978 0055 31       		.uleb128 0x31
+ 979 0056 13       		.uleb128 0x13
+ 980 0057 00       		.byte	0
+ 981 0058 00       		.byte	0
+ 982 0059 07       		.uleb128 0x7
+ 983 005a 8A8201   		.uleb128 0x410a
+ 984 005d 00       		.byte	0
+ 985 005e 02       		.uleb128 0x2
+ 986 005f 18       		.uleb128 0x18
+ 987 0060 9142     		.uleb128 0x2111
+ 988 0062 18       		.uleb128 0x18
+ 989 0063 00       		.byte	0
+ 990 0064 00       		.byte	0
+ 991 0065 08       		.uleb128 0x8
+ 992 0066 898201   		.uleb128 0x4109
+ 993 0069 01       		.byte	0x1
+ 994 006a 11       		.uleb128 0x11
+ 995 006b 01       		.uleb128 0x1
+ 996 006c 31       		.uleb128 0x31
+ 997 006d 13       		.uleb128 0x13
+ 998 006e 01       		.uleb128 0x1
+ 999 006f 13       		.uleb128 0x13
+ 1000 0070 00       		.byte	0
+ 1001 0071 00       		.byte	0
+ 1002 0072 09       		.uleb128 0x9
+ 1003 0073 2E       		.uleb128 0x2e
+ 1004 0074 01       		.byte	0x1
+ 1005 0075 3F       		.uleb128 0x3f
+ 1006 0076 19       		.uleb128 0x19
+ 1007 0077 03       		.uleb128 0x3
+ 1008 0078 0E       		.uleb128 0xe
+ 1009 0079 3A       		.uleb128 0x3a
+ 1010 007a 0B       		.uleb128 0xb
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 21
+
+
+ 1011 007b 3B       		.uleb128 0x3b
+ 1012 007c 0B       		.uleb128 0xb
+ 1013 007d 49       		.uleb128 0x49
+ 1014 007e 13       		.uleb128 0x13
+ 1015 007f 11       		.uleb128 0x11
+ 1016 0080 01       		.uleb128 0x1
+ 1017 0081 12       		.uleb128 0x12
+ 1018 0082 06       		.uleb128 0x6
+ 1019 0083 40       		.uleb128 0x40
+ 1020 0084 18       		.uleb128 0x18
+ 1021 0085 9742     		.uleb128 0x2117
+ 1022 0087 19       		.uleb128 0x19
+ 1023 0088 01       		.uleb128 0x1
+ 1024 0089 13       		.uleb128 0x13
+ 1025 008a 00       		.byte	0
+ 1026 008b 00       		.byte	0
+ 1027 008c 0A       		.uleb128 0xa
+ 1028 008d 898201   		.uleb128 0x4109
+ 1029 0090 00       		.byte	0
+ 1030 0091 11       		.uleb128 0x11
+ 1031 0092 01       		.uleb128 0x1
+ 1032 0093 31       		.uleb128 0x31
+ 1033 0094 13       		.uleb128 0x13
+ 1034 0095 00       		.byte	0
+ 1035 0096 00       		.byte	0
+ 1036 0097 0B       		.uleb128 0xb
+ 1037 0098 2E       		.uleb128 0x2e
+ 1038 0099 01       		.byte	0x1
+ 1039 009a 3F       		.uleb128 0x3f
+ 1040 009b 19       		.uleb128 0x19
+ 1041 009c 03       		.uleb128 0x3
+ 1042 009d 0E       		.uleb128 0xe
+ 1043 009e 3A       		.uleb128 0x3a
+ 1044 009f 0B       		.uleb128 0xb
+ 1045 00a0 3B       		.uleb128 0x3b
+ 1046 00a1 0B       		.uleb128 0xb
+ 1047 00a2 27       		.uleb128 0x27
+ 1048 00a3 19       		.uleb128 0x19
+ 1049 00a4 49       		.uleb128 0x49
+ 1050 00a5 13       		.uleb128 0x13
+ 1051 00a6 11       		.uleb128 0x11
+ 1052 00a7 01       		.uleb128 0x1
+ 1053 00a8 12       		.uleb128 0x12
+ 1054 00a9 06       		.uleb128 0x6
+ 1055 00aa 40       		.uleb128 0x40
+ 1056 00ab 18       		.uleb128 0x18
+ 1057 00ac 9742     		.uleb128 0x2117
+ 1058 00ae 19       		.uleb128 0x19
+ 1059 00af 01       		.uleb128 0x1
+ 1060 00b0 13       		.uleb128 0x13
+ 1061 00b1 00       		.byte	0
+ 1062 00b2 00       		.byte	0
+ 1063 00b3 0C       		.uleb128 0xc
+ 1064 00b4 05       		.uleb128 0x5
+ 1065 00b5 00       		.byte	0
+ 1066 00b6 03       		.uleb128 0x3
+ 1067 00b7 08       		.uleb128 0x8
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 22
+
+
+ 1068 00b8 3A       		.uleb128 0x3a
+ 1069 00b9 0B       		.uleb128 0xb
+ 1070 00ba 3B       		.uleb128 0x3b
+ 1071 00bb 0B       		.uleb128 0xb
+ 1072 00bc 49       		.uleb128 0x49
+ 1073 00bd 13       		.uleb128 0x13
+ 1074 00be 02       		.uleb128 0x2
+ 1075 00bf 17       		.uleb128 0x17
+ 1076 00c0 00       		.byte	0
+ 1077 00c1 00       		.byte	0
+ 1078 00c2 0D       		.uleb128 0xd
+ 1079 00c3 05       		.uleb128 0x5
+ 1080 00c4 00       		.byte	0
+ 1081 00c5 03       		.uleb128 0x3
+ 1082 00c6 0E       		.uleb128 0xe
+ 1083 00c7 3A       		.uleb128 0x3a
+ 1084 00c8 0B       		.uleb128 0xb
+ 1085 00c9 3B       		.uleb128 0x3b
+ 1086 00ca 0B       		.uleb128 0xb
+ 1087 00cb 49       		.uleb128 0x49
+ 1088 00cc 13       		.uleb128 0x13
+ 1089 00cd 02       		.uleb128 0x2
+ 1090 00ce 17       		.uleb128 0x17
+ 1091 00cf 00       		.byte	0
+ 1092 00d0 00       		.byte	0
+ 1093 00d1 0E       		.uleb128 0xe
+ 1094 00d2 0F       		.uleb128 0xf
+ 1095 00d3 00       		.byte	0
+ 1096 00d4 0B       		.uleb128 0xb
+ 1097 00d5 0B       		.uleb128 0xb
+ 1098 00d6 49       		.uleb128 0x49
+ 1099 00d7 13       		.uleb128 0x13
+ 1100 00d8 00       		.byte	0
+ 1101 00d9 00       		.byte	0
+ 1102 00da 0F       		.uleb128 0xf
+ 1103 00db 2E       		.uleb128 0x2e
+ 1104 00dc 01       		.byte	0x1
+ 1105 00dd 3F       		.uleb128 0x3f
+ 1106 00de 19       		.uleb128 0x19
+ 1107 00df 03       		.uleb128 0x3
+ 1108 00e0 0E       		.uleb128 0xe
+ 1109 00e1 3A       		.uleb128 0x3a
+ 1110 00e2 0B       		.uleb128 0xb
+ 1111 00e3 3B       		.uleb128 0x3b
+ 1112 00e4 0B       		.uleb128 0xb
+ 1113 00e5 27       		.uleb128 0x27
+ 1114 00e6 19       		.uleb128 0x19
+ 1115 00e7 49       		.uleb128 0x49
+ 1116 00e8 13       		.uleb128 0x13
+ 1117 00e9 8701     		.uleb128 0x87
+ 1118 00eb 19       		.uleb128 0x19
+ 1119 00ec 11       		.uleb128 0x11
+ 1120 00ed 01       		.uleb128 0x1
+ 1121 00ee 12       		.uleb128 0x12
+ 1122 00ef 06       		.uleb128 0x6
+ 1123 00f0 40       		.uleb128 0x40
+ 1124 00f1 18       		.uleb128 0x18
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 23
+
+
+ 1125 00f2 9742     		.uleb128 0x2117
+ 1126 00f4 19       		.uleb128 0x19
+ 1127 00f5 01       		.uleb128 0x1
+ 1128 00f6 13       		.uleb128 0x13
+ 1129 00f7 00       		.byte	0
+ 1130 00f8 00       		.byte	0
+ 1131 00f9 10       		.uleb128 0x10
+ 1132 00fa 0A       		.uleb128 0xa
+ 1133 00fb 00       		.byte	0
+ 1134 00fc 03       		.uleb128 0x3
+ 1135 00fd 0E       		.uleb128 0xe
+ 1136 00fe 3A       		.uleb128 0x3a
+ 1137 00ff 0B       		.uleb128 0xb
+ 1138 0100 3B       		.uleb128 0x3b
+ 1139 0101 0B       		.uleb128 0xb
+ 1140 0102 11       		.uleb128 0x11
+ 1141 0103 01       		.uleb128 0x1
+ 1142 0104 00       		.byte	0
+ 1143 0105 00       		.byte	0
+ 1144 0106 11       		.uleb128 0x11
+ 1145 0107 0B       		.uleb128 0xb
+ 1146 0108 01       		.byte	0x1
+ 1147 0109 11       		.uleb128 0x11
+ 1148 010a 01       		.uleb128 0x1
+ 1149 010b 12       		.uleb128 0x12
+ 1150 010c 06       		.uleb128 0x6
+ 1151 010d 01       		.uleb128 0x1
+ 1152 010e 13       		.uleb128 0x13
+ 1153 010f 00       		.byte	0
+ 1154 0110 00       		.byte	0
+ 1155 0111 12       		.uleb128 0x12
+ 1156 0112 34       		.uleb128 0x34
+ 1157 0113 00       		.byte	0
+ 1158 0114 03       		.uleb128 0x3
+ 1159 0115 0E       		.uleb128 0xe
+ 1160 0116 3A       		.uleb128 0x3a
+ 1161 0117 0B       		.uleb128 0xb
+ 1162 0118 3B       		.uleb128 0x3b
+ 1163 0119 0B       		.uleb128 0xb
+ 1164 011a 49       		.uleb128 0x49
+ 1165 011b 13       		.uleb128 0x13
+ 1166 011c 02       		.uleb128 0x2
+ 1167 011d 17       		.uleb128 0x17
+ 1168 011e 00       		.byte	0
+ 1169 011f 00       		.byte	0
+ 1170 0120 13       		.uleb128 0x13
+ 1171 0121 34       		.uleb128 0x34
+ 1172 0122 00       		.byte	0
+ 1173 0123 03       		.uleb128 0x3
+ 1174 0124 0E       		.uleb128 0xe
+ 1175 0125 3A       		.uleb128 0x3a
+ 1176 0126 0B       		.uleb128 0xb
+ 1177 0127 3B       		.uleb128 0x3b
+ 1178 0128 0B       		.uleb128 0xb
+ 1179 0129 49       		.uleb128 0x49
+ 1180 012a 13       		.uleb128 0x13
+ 1181 012b 02       		.uleb128 0x2
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 24
+
+
+ 1182 012c 18       		.uleb128 0x18
+ 1183 012d 00       		.byte	0
+ 1184 012e 00       		.byte	0
+ 1185 012f 14       		.uleb128 0x14
+ 1186 0130 0B       		.uleb128 0xb
+ 1187 0131 01       		.byte	0x1
+ 1188 0132 11       		.uleb128 0x11
+ 1189 0133 01       		.uleb128 0x1
+ 1190 0134 12       		.uleb128 0x12
+ 1191 0135 06       		.uleb128 0x6
+ 1192 0136 00       		.byte	0
+ 1193 0137 00       		.byte	0
+ 1194 0138 15       		.uleb128 0x15
+ 1195 0139 01       		.uleb128 0x1
+ 1196 013a 01       		.byte	0x1
+ 1197 013b 49       		.uleb128 0x49
+ 1198 013c 13       		.uleb128 0x13
+ 1199 013d 01       		.uleb128 0x1
+ 1200 013e 13       		.uleb128 0x13
+ 1201 013f 00       		.byte	0
+ 1202 0140 00       		.byte	0
+ 1203 0141 16       		.uleb128 0x16
+ 1204 0142 21       		.uleb128 0x21
+ 1205 0143 00       		.byte	0
+ 1206 0144 49       		.uleb128 0x49
+ 1207 0145 13       		.uleb128 0x13
+ 1208 0146 2F       		.uleb128 0x2f
+ 1209 0147 0B       		.uleb128 0xb
+ 1210 0148 00       		.byte	0
+ 1211 0149 00       		.byte	0
+ 1212 014a 17       		.uleb128 0x17
+ 1213 014b 2E       		.uleb128 0x2e
+ 1214 014c 00       		.byte	0
+ 1215 014d 3F       		.uleb128 0x3f
+ 1216 014e 19       		.uleb128 0x19
+ 1217 014f 3C       		.uleb128 0x3c
+ 1218 0150 19       		.uleb128 0x19
+ 1219 0151 6E       		.uleb128 0x6e
+ 1220 0152 0E       		.uleb128 0xe
+ 1221 0153 03       		.uleb128 0x3
+ 1222 0154 0E       		.uleb128 0xe
+ 1223 0155 3A       		.uleb128 0x3a
+ 1224 0156 0B       		.uleb128 0xb
+ 1225 0157 3B       		.uleb128 0x3b
+ 1226 0158 0B       		.uleb128 0xb
+ 1227 0159 00       		.byte	0
+ 1228 015a 00       		.byte	0
+ 1229 015b 18       		.uleb128 0x18
+ 1230 015c 2E       		.uleb128 0x2e
+ 1231 015d 00       		.byte	0
+ 1232 015e 3F       		.uleb128 0x3f
+ 1233 015f 19       		.uleb128 0x19
+ 1234 0160 3C       		.uleb128 0x3c
+ 1235 0161 19       		.uleb128 0x19
+ 1236 0162 6E       		.uleb128 0x6e
+ 1237 0163 0E       		.uleb128 0xe
+ 1238 0164 03       		.uleb128 0x3
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 25
+
+
+ 1239 0165 0E       		.uleb128 0xe
+ 1240 0166 00       		.byte	0
+ 1241 0167 00       		.byte	0
+ 1242 0168 00       		.byte	0
+ 1243              		.section	.debug_loc,"",%progbits
+ 1244              	.Ldebug_loc0:
+ 1245              	.LLST0:
+ 1246 0000 00000000 		.4byte	.LVL8
+ 1247 0004 0E000000 		.4byte	.LVL10
+ 1248 0008 0100     		.2byte	0x1
+ 1249 000a 50       		.byte	0x50
+ 1250 000b 0E000000 		.4byte	.LVL10
+ 1251 000f 2A000000 		.4byte	.LVL12
+ 1252 0013 0100     		.2byte	0x1
+ 1253 0015 55       		.byte	0x55
+ 1254 0016 2A000000 		.4byte	.LVL12
+ 1255 001a 2C000000 		.4byte	.LVL13
+ 1256 001e 0100     		.2byte	0x1
+ 1257 0020 50       		.byte	0x50
+ 1258 0021 2C000000 		.4byte	.LVL13
+ 1259 0025 30000000 		.4byte	.LVL16
+ 1260 0029 0100     		.2byte	0x1
+ 1261 002b 55       		.byte	0x55
+ 1262 002c 30000000 		.4byte	.LVL16
+ 1263 0030 32000000 		.4byte	.LFE41
+ 1264 0034 0400     		.2byte	0x4
+ 1265 0036 F3       		.byte	0xf3
+ 1266 0037 01       		.uleb128 0x1
+ 1267 0038 50       		.byte	0x50
+ 1268 0039 9F       		.byte	0x9f
+ 1269 003a 00000000 		.4byte	0
+ 1270 003e 00000000 		.4byte	0
+ 1271              	.LLST1:
+ 1272 0042 00000000 		.4byte	.LVL8
+ 1273 0046 0C000000 		.4byte	.LVL9
+ 1274 004a 0100     		.2byte	0x1
+ 1275 004c 51       		.byte	0x51
+ 1276 004d 0C000000 		.4byte	.LVL9
+ 1277 0051 11000000 		.4byte	.LVL11-1
+ 1278 0055 0300     		.2byte	0x3
+ 1279 0057 71       		.byte	0x71
+ 1280 0058 01       		.sleb128 1
+ 1281 0059 9F       		.byte	0x9f
+ 1282 005a 11000000 		.4byte	.LVL11-1
+ 1283 005e 2A000000 		.4byte	.LVL12
+ 1284 0062 0400     		.2byte	0x4
+ 1285 0064 F3       		.byte	0xf3
+ 1286 0065 01       		.uleb128 0x1
+ 1287 0066 51       		.byte	0x51
+ 1288 0067 9F       		.byte	0x9f
+ 1289 0068 2A000000 		.4byte	.LVL12
+ 1290 006c 2E000000 		.4byte	.LVL14
+ 1291 0070 0100     		.2byte	0x1
+ 1292 0072 51       		.byte	0x51
+ 1293 0073 2E000000 		.4byte	.LVL14
+ 1294 0077 32000000 		.4byte	.LFE41
+ 1295 007b 0400     		.2byte	0x4
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 26
+
+
+ 1296 007d F3       		.byte	0xf3
+ 1297 007e 01       		.uleb128 0x1
+ 1298 007f 51       		.byte	0x51
+ 1299 0080 9F       		.byte	0x9f
+ 1300 0081 00000000 		.4byte	0
+ 1301 0085 00000000 		.4byte	0
+ 1302              	.LLST2:
+ 1303 0089 00000000 		.4byte	.LVL8
+ 1304 008d 11000000 		.4byte	.LVL11-1
+ 1305 0091 0100     		.2byte	0x1
+ 1306 0093 52       		.byte	0x52
+ 1307 0094 11000000 		.4byte	.LVL11-1
+ 1308 0098 2A000000 		.4byte	.LVL12
+ 1309 009c 0100     		.2byte	0x1
+ 1310 009e 54       		.byte	0x54
+ 1311 009f 2A000000 		.4byte	.LVL12
+ 1312 00a3 2E000000 		.4byte	.LVL14
+ 1313 00a7 0100     		.2byte	0x1
+ 1314 00a9 52       		.byte	0x52
+ 1315 00aa 2E000000 		.4byte	.LVL14
+ 1316 00ae 30000000 		.4byte	.LVL15
+ 1317 00b2 0100     		.2byte	0x1
+ 1318 00b4 54       		.byte	0x54
+ 1319 00b5 30000000 		.4byte	.LVL15
+ 1320 00b9 32000000 		.4byte	.LFE41
+ 1321 00bd 0400     		.2byte	0x4
+ 1322 00bf F3       		.byte	0xf3
+ 1323 00c0 01       		.uleb128 0x1
+ 1324 00c1 52       		.byte	0x52
+ 1325 00c2 9F       		.byte	0x9f
+ 1326 00c3 00000000 		.4byte	0
+ 1327 00c7 00000000 		.4byte	0
+ 1328              	.LLST3:
+ 1329 00cb 16000000 		.4byte	.LVL19
+ 1330 00cf 4A000000 		.4byte	.LVL28
+ 1331 00d3 0200     		.2byte	0x2
+ 1332 00d5 30       		.byte	0x30
+ 1333 00d6 9F       		.byte	0x9f
+ 1334 00d7 4A000000 		.4byte	.LVL28
+ 1335 00db A0000000 		.4byte	.LFE36
+ 1336 00df 0100     		.2byte	0x1
+ 1337 00e1 56       		.byte	0x56
+ 1338 00e2 00000000 		.4byte	0
+ 1339 00e6 00000000 		.4byte	0
+ 1340              	.LLST4:
+ 1341 00ea 16000000 		.4byte	.LVL19
+ 1342 00ee 4A000000 		.4byte	.LVL28
+ 1343 00f2 0200     		.2byte	0x2
+ 1344 00f4 31       		.byte	0x31
+ 1345 00f5 9F       		.byte	0x9f
+ 1346 00f6 4A000000 		.4byte	.LVL28
+ 1347 00fa 5C000000 		.4byte	.LVL31
+ 1348 00fe 0100     		.2byte	0x1
+ 1349 0100 54       		.byte	0x54
+ 1350 0101 5E000000 		.4byte	.LVL32
+ 1351 0105 A0000000 		.4byte	.LFE36
+ 1352 0109 0100     		.2byte	0x1
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 27
+
+
+ 1353 010b 54       		.byte	0x54
+ 1354 010c 00000000 		.4byte	0
+ 1355 0110 00000000 		.4byte	0
+ 1356              	.LLST5:
+ 1357 0114 4A000000 		.4byte	.LVL28
+ 1358 0118 4E000000 		.4byte	.LVL29
+ 1359 011c 0200     		.2byte	0x2
+ 1360 011e 30       		.byte	0x30
+ 1361 011f 9F       		.byte	0x9f
+ 1362 0120 4E000000 		.4byte	.LVL29
+ 1363 0124 A0000000 		.4byte	.LFE36
+ 1364 0128 0100     		.2byte	0x1
+ 1365 012a 55       		.byte	0x55
+ 1366 012b 00000000 		.4byte	0
+ 1367 012f 00000000 		.4byte	0
+ 1368              	.LLST6:
+ 1369 0133 54000000 		.4byte	.LVL30
+ 1370 0137 5C000000 		.4byte	.LVL31
+ 1371 013b 0100     		.2byte	0x1
+ 1372 013d 53       		.byte	0x53
+ 1373 013e 5C000000 		.4byte	.LVL31
+ 1374 0142 60000000 		.4byte	.LVL33
+ 1375 0146 0700     		.2byte	0x7
+ 1376 0148 75       		.byte	0x75
+ 1377 0149 00       		.sleb128 0
+ 1378 014a 32       		.byte	0x32
+ 1379 014b 24       		.byte	0x24
+ 1380 014c 7D       		.byte	0x7d
+ 1381 014d 00       		.sleb128 0
+ 1382 014e 22       		.byte	0x22
+ 1383 014f 60000000 		.4byte	.LVL33
+ 1384 0153 68000000 		.4byte	.LVL34
+ 1385 0157 0100     		.2byte	0x1
+ 1386 0159 53       		.byte	0x53
+ 1387 015a 68000000 		.4byte	.LVL34
+ 1388 015e 6D000000 		.4byte	.LVL35-1
+ 1389 0162 0700     		.2byte	0x7
+ 1390 0164 75       		.byte	0x75
+ 1391 0165 00       		.sleb128 0
+ 1392 0166 32       		.byte	0x32
+ 1393 0167 24       		.byte	0x24
+ 1394 0168 7D       		.byte	0x7d
+ 1395 0169 00       		.sleb128 0
+ 1396 016a 22       		.byte	0x22
+ 1397 016b 00000000 		.4byte	0
+ 1398 016f 00000000 		.4byte	0
+ 1399              		.section	.debug_aranges,"",%progbits
+ 1400 0000 44000000 		.4byte	0x44
+ 1401 0004 0200     		.2byte	0x2
+ 1402 0006 00000000 		.4byte	.Ldebug_info0
+ 1403 000a 04       		.byte	0x4
+ 1404 000b 00       		.byte	0
+ 1405 000c 0000     		.2byte	0
+ 1406 000e 0000     		.2byte	0
+ 1407 0010 00000000 		.4byte	.LFB37
+ 1408 0014 0A000000 		.4byte	.LFE37-.LFB37
+ 1409 0018 00000000 		.4byte	.LFB38
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 28
+
+
+ 1410 001c 1C000000 		.4byte	.LFE38-.LFB38
+ 1411 0020 00000000 		.4byte	.LFB39
+ 1412 0024 1C000000 		.4byte	.LFE39-.LFB39
+ 1413 0028 00000000 		.4byte	.LFB40
+ 1414 002c 0C000000 		.4byte	.LFE40-.LFB40
+ 1415 0030 00000000 		.4byte	.LFB41
+ 1416 0034 32000000 		.4byte	.LFE41-.LFB41
+ 1417 0038 00000000 		.4byte	.LFB36
+ 1418 003c A0000000 		.4byte	.LFE36-.LFB36
+ 1419 0040 00000000 		.4byte	0
+ 1420 0044 00000000 		.4byte	0
+ 1421              		.section	.debug_ranges,"",%progbits
+ 1422              	.Ldebug_ranges0:
+ 1423 0000 00000000 		.4byte	.LFB37
+ 1424 0004 0A000000 		.4byte	.LFE37
+ 1425 0008 00000000 		.4byte	.LFB38
+ 1426 000c 1C000000 		.4byte	.LFE38
+ 1427 0010 00000000 		.4byte	.LFB39
+ 1428 0014 1C000000 		.4byte	.LFE39
+ 1429 0018 00000000 		.4byte	.LFB40
+ 1430 001c 0C000000 		.4byte	.LFE40
+ 1431 0020 00000000 		.4byte	.LFB41
+ 1432 0024 32000000 		.4byte	.LFE41
+ 1433 0028 00000000 		.4byte	.LFB36
+ 1434 002c A0000000 		.4byte	.LFE36
+ 1435 0030 00000000 		.4byte	0
+ 1436 0034 00000000 		.4byte	0
+ 1437              		.section	.debug_line,"",%progbits
+ 1438              	.Ldebug_line0:
+ 1439 0000 2F020000 		.section	.debug_str,"MS",%progbits,1
+ 1439      02008101 
+ 1439      00000201 
+ 1439      FB0E0D00 
+ 1439      01010101 
+ 1440              	.LASF38:
+ 1441 0000 6E657874 		.ascii	"next_seq\000"
+ 1441      5F736571 
+ 1441      00
+ 1442              	.LASF32:
+ 1443 0009 435F5265 		.ascii	"C_Reg_Write\000"
+ 1443      675F5772 
+ 1443      69746500 
+ 1444              	.LASF9:
+ 1445 0015 5F5F7569 		.ascii	"__uint8_t\000"
+ 1445      6E74385F 
+ 1445      7400
+ 1446              	.LASF18:
+ 1447 001f 7265706F 		.ascii	"report_correct\000"
+ 1447      72745F63 
+ 1447      6F727265 
+ 1447      637400
+ 1448              	.LASF20:
+ 1449 002e 6D61785F 		.ascii	"max_number\000"
+ 1449      6E756D62 
+ 1449      657200
+ 1450              	.LASF37:
+ 1451 0039 63686563 		.ascii	"check\000"
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 29
+
+
+ 1451      6B00
+ 1452              	.LASF17:
+ 1453 003f 7265706F 		.ascii	"report_incorrect\000"
+ 1453      72745F69 
+ 1453      6E636F72 
+ 1453      72656374 
+ 1453      00
+ 1454              	.LASF11:
+ 1455 0050 666C6F61 		.ascii	"float\000"
+ 1455      7400
+ 1456              	.LASF0:
+ 1457 0056 7369676E 		.ascii	"signed char\000"
+ 1457      65642063 
+ 1457      68617200 
+ 1458              	.LASF16:
+ 1459 0062 64656C61 		.ascii	"delay\000"
+ 1459      7900
+ 1460              	.LASF22:
+ 1461 0068 6375725F 		.ascii	"cur_c\000"
+ 1461      6300
+ 1462              	.LASF21:
+ 1463 006e 6375725F 		.ascii	"cur_d\000"
+ 1463      6400
+ 1464              	.LASF36:
+ 1465 0074 433A5C55 		.ascii	"C:\\Users\\bogda\\ExamTester\\74374_OctalDFlipFlop."
+ 1465      73657273 
+ 1465      5C626F67 
+ 1465      64615C45 
+ 1465      78616D54 
+ 1466 00a3 63796473 		.ascii	"cydsn\000"
+ 1466      6E00
+ 1467              	.LASF24:
+ 1468 00a9 6E756D5F 		.ascii	"num_action\000"
+ 1468      61637469 
+ 1468      6F6E00
+ 1469              	.LASF26:
+ 1470 00b4 43794465 		.ascii	"CyDelayCycles\000"
+ 1470      6C617943 
+ 1470      79636C65 
+ 1470      7300
+ 1471              	.LASF5:
+ 1472 00c2 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1472      20756E73 
+ 1472      69676E65 
+ 1472      6420696E 
+ 1472      7400
+ 1473              	.LASF3:
+ 1474 00d4 73686F72 		.ascii	"short unsigned int\000"
+ 1474      7420756E 
+ 1474      7369676E 
+ 1474      65642069 
+ 1474      6E7400
+ 1475              	.LASF33:
+ 1476 00e7 55415254 		.ascii	"UART_Start\000"
+ 1476      5F537461 
+ 1476      727400
+ 1477              	.LASF29:
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 30
+
+
+ 1478 00f2 50696E5F 		.ascii	"Pin_OK_Write\000"
+ 1478      4F4B5F57 
+ 1478      72697465 
+ 1478      00
+ 1479              	.LASF25:
+ 1480 00ff 61637469 		.ascii	"action_code\000"
+ 1480      6F6E5F63 
+ 1480      6F646500 
+ 1481              	.LASF1:
+ 1482 010b 756E7369 		.ascii	"unsigned char\000"
+ 1482      676E6564 
+ 1482      20636861 
+ 1482      7200
+ 1483              	.LASF41:
+ 1484 0119 6D656D73 		.ascii	"memset\000"
+ 1484      657400
+ 1485              	.LASF12:
+ 1486 0120 646F7562 		.ascii	"double\000"
+ 1486      6C6500
+ 1487              	.LASF39:
+ 1488 0127 6D61696E 		.ascii	"main\000"
+ 1488      00
+ 1489              	.LASF8:
+ 1490 012c 756E7369 		.ascii	"unsigned int\000"
+ 1490      676E6564 
+ 1490      20696E74 
+ 1490      00
+ 1491              	.LASF7:
+ 1492 0139 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1492      206C6F6E 
+ 1492      6720756E 
+ 1492      7369676E 
+ 1492      65642069 
+ 1493              	.LASF10:
+ 1494 0150 75696E74 		.ascii	"uint8_t\000"
+ 1494      385F7400 
+ 1495              	.LASF30:
+ 1496 0158 45715F52 		.ascii	"Eq_Reg_Read\000"
+ 1496      65675F52 
+ 1496      65616400 
+ 1497              	.LASF34:
+ 1498 0164 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1498      43313120 
+ 1498      352E342E 
+ 1498      31203230 
+ 1498      31363036 
+ 1499 0197 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m0 -mthumb -g -O"
+ 1499      20726576 
+ 1499      6973696F 
+ 1499      6E203233 
+ 1499      37373135 
+ 1500 01ca 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1500      66756E63 
+ 1500      74696F6E 
+ 1500      2D736563 
+ 1500      74696F6E 
+ 1501              	.LASF15:
+ARM GAS  C:\Users\bogda\AppData\Local\Temp\ccODkgs6.s 			page 31
+
+
+ 1502 01f2 73697A65 		.ascii	"sizetype\000"
+ 1502      74797065 
+ 1502      00
+ 1503              	.LASF6:
+ 1504 01fb 6C6F6E67 		.ascii	"long long int\000"
+ 1504      206C6F6E 
+ 1504      6720696E 
+ 1504      7400
+ 1505              	.LASF35:
+ 1506 0209 6D61696E 		.ascii	"main.c\000"
+ 1506      2E6300
+ 1507              	.LASF13:
+ 1508 0210 63686172 		.ascii	"char\000"
+ 1508      00
+ 1509              	.LASF31:
+ 1510 0215 445F5265 		.ascii	"D_Reg_Write\000"
+ 1510      675F5772 
+ 1510      69746500 
+ 1511              	.LASF2:
+ 1512 0221 73686F72 		.ascii	"short int\000"
+ 1512      7420696E 
+ 1512      7400
+ 1513              	.LASF40:
+ 1514 022b 73746172 		.ascii	"start_outer_loop\000"
+ 1514      745F6F75 
+ 1514      7465725F 
+ 1514      6C6F6F70 
+ 1514      00
+ 1515              	.LASF4:
+ 1516 023c 6C6F6E67 		.ascii	"long int\000"
+ 1516      20696E74 
+ 1516      00
+ 1517              	.LASF23:
+ 1518 0245 7365715F 		.ascii	"seq_of_actions\000"
+ 1518      6F665F61 
+ 1518      6374696F 
+ 1518      6E7300
+ 1519              	.LASF14:
+ 1520 0254 6C6F6E67 		.ascii	"long double\000"
+ 1520      20646F75 
+ 1520      626C6500 
+ 1521              	.LASF27:
+ 1522 0260 50696E5F 		.ascii	"Pin_ERR_Write\000"
+ 1522      4552525F 
+ 1522      57726974 
+ 1522      6500
+ 1523              	.LASF19:
+ 1524 026e 73697A65 		.ascii	"size\000"
+ 1524      00
+ 1525              	.LASF28:
+ 1526 0273 43794465 		.ascii	"CyDelay\000"
+ 1526      6C617900 
+ 1527              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
